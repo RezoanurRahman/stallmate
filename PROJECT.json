@@ -1,0 +1,9 @@
+{
+  "name": "Stallmate",
+  "slug": "stallmate",
+  "summary": "Stallmate is a polished local-first weekend market operations desk for coordinating vendors, stall assignments, setup tasks, and event readiness. It pairs a Hyperapp dashboard with an Express API and deterministic in-memory storage for a focused, dependable workflow.",
+  "frontend": "Hyperapp 2 + Vite",
+  "backend": "Express 5",
+  "storage": "in-memory",
+  "language": "typescript"
+}
