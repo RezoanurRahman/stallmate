@@ -1,10 +1,10 @@
 /// <reference types="vite/client" />
 
-import "./styles.css";
+import './styles.css';
 
-import { bootstrapApp } from "./app";
+import { bootstrapApp } from './app';
 
-const mountNode = document.getElementById("app");
+const mountNode = document.getElementById('app');
 
 if (mountNode) {
   bootstrapApp(mountNode);

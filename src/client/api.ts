@@ -15,8 +15,8 @@
  * shown directly in the UI.
  */
 
-export type MarketStatus = "planning" | "confirmed" | "live" | "complete";
-export type VendorStatus = "confirmed" | "pending" | "waitlist";
+export type MarketStatus = 'planning' | 'confirmed' | 'live' | 'complete';
+export type VendorStatus = 'confirmed' | 'pending' | 'waitlist';
 
 export interface Market {
   id: string;
@@ -98,16 +98,16 @@ export interface NewVendorInput {
 export type VendorUpdateInput = Partial<
   Pick<
     Vendor,
-    "marketId" | "name" | "category" | "stall" | "contact" | "fee" | "status" | "checkedIn"
+    'marketId' | 'name' | 'category' | 'stall' | 'contact' | 'fee' | 'status' | 'checkedIn'
   >
 >;
 
 /** Base path of the Express API. The Vite dev server proxies this to the API. */
-export const API_BASE = "/api";
+export const API_BASE = '/api';
 
 const REQUEST_TIMEOUT_MS = 12_000;
 
-type HttpMethod = "GET" | "POST" | "PATCH";
+type HttpMethod = 'GET' | 'POST' | 'PATCH';
 
 interface RequestOptions {
   method?: HttpMethod;
@@ -120,7 +120,7 @@ interface TaggedError extends Error {
 
 function toError(value: unknown, fallback: string): Error {
   if (value instanceof Error && value.message) return value;
-  if (typeof value === "string" && value.trim()) return new Error(value);
+  if (typeof value === 'string' && value.trim()) return new Error(value);
   return new Error(fallback);
 }
 
@@ -134,18 +134,18 @@ function statusOf(error: unknown): number | undefined {
 }
 
 async function describeHttpError(response: Response, context: string): Promise<string> {
-  let detail = "";
+  let detail = '';
   try {
     const raw = (await response.text()).trim();
     if (raw) {
       try {
         const parsed: unknown = JSON.parse(raw);
-        if (typeof parsed === "string") {
+        if (typeof parsed === 'string') {
           detail = parsed;
-        } else if (parsed && typeof parsed === "object") {
+        } else if (parsed && typeof parsed === 'object') {
           const record = parsed as Record<string, unknown>;
           const candidate = record.error ?? record.message;
-          if (typeof candidate === "string") detail = candidate;
+          if (typeof candidate === 'string') detail = candidate;
         }
       } catch {
         detail = raw;
@@ -155,7 +155,7 @@ async function describeHttpError(response: Response, context: string): Promise<s
     /* The body could not be read; fall back to the status line. */
   }
 
-  const status = `${response.status}${response.statusText ? ` ${response.statusText}` : ""}`;
+  const status = `${response.status}${response.statusText ? ` ${response.statusText}` : ''}`;
   return detail
     ? `${context} failed (${status}): ${detail}`
     : `${context} failed with HTTP ${status}.`;
@@ -164,11 +164,11 @@ async function describeHttpError(response: Response, context: string): Promise<s
 async function request<T>(
   path: string,
   options: RequestOptions = {},
-  context = "Request",
+  context = 'Request',
 ): Promise<T> {
-  const method = options.method ?? "GET";
+  const method = options.method ?? 'GET';
   const hasBody = options.body !== undefined;
-  const controller = typeof AbortController === "function" ? new AbortController() : null;
+  const controller = typeof AbortController === 'function' ? new AbortController() : null;
   const timer =
     controller === null ? null : window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
@@ -177,8 +177,8 @@ async function request<T>(
     response = await fetch(`${API_BASE}${path}`, {
       method,
       headers: hasBody
-        ? { Accept: "application/json", "Content-Type": "application/json" }
-        : { Accept: "application/json" },
+        ? { Accept: 'application/json', 'Content-Type': 'application/json' }
+        : { Accept: 'application/json' },
       body: hasBody ? JSON.stringify(options.body) : undefined,
       signal: controller ? controller.signal : undefined,
     });
@@ -191,7 +191,7 @@ async function request<T>(
         undefined,
       );
     }
-    const reason = error instanceof Error && error.message ? ` (${error.message})` : "";
+    const reason = error instanceof Error && error.message ? ` (${error.message})` : '';
     throw tagStatus(
       new Error(`${context} failed: could not reach the Stallmate API${reason}.`),
       undefined,
@@ -209,7 +209,10 @@ async function request<T>(
   try {
     return JSON.parse(raw) as T;
   } catch {
-    throw tagStatus(new Error(`${context} failed: the API returned invalid JSON.`), response.status);
+    throw tagStatus(
+      new Error(`${context} failed: the API returned invalid JSON.`),
+      response.status,
+    );
   }
 }
 
@@ -240,55 +243,63 @@ async function requestWithFallback<T>(
  * A body that already carries its own `id` is returned untouched.
  */
 function extractEntity<T>(body: unknown, keys: readonly string[]): T {
-  if (body === null || typeof body !== "object" || Array.isArray(body)) return body as T;
+  if (body === null || typeof body !== 'object' || Array.isArray(body)) return body as T;
   const record = body as Record<string, unknown>;
-  if (typeof record.id === "string") return body as T;
+  if (typeof record.id === 'string') return body as T;
   for (const key of keys) {
     const value = record[key];
-    if (value !== null && typeof value === "object") return value as T;
+    if (value !== null && typeof value === 'object') return value as T;
   }
   return body as T;
 }
 
 /** Loads the whole operations desk in a single request. */
 export async function fetchDashboard(): Promise<Dashboard> {
-  const body = await request<unknown>("/dashboard", { method: "GET" }, "Dashboard load");
-  return extractEntity<Dashboard>(body, ["dashboard", "data"]);
+  const body = await request<unknown>('/dashboard', { method: 'GET' }, 'Dashboard load');
+  return extractEntity<Dashboard>(body, ['dashboard', 'data']);
 }
 
 export async function createMarket(input: NewMarketInput): Promise<Market> {
-  const body = await request<unknown>("/markets", { method: "POST", body: input }, "Market creation");
-  return extractEntity<Market>(body, ["market", "data"]);
+  const body = await request<unknown>(
+    '/markets',
+    { method: 'POST', body: input },
+    'Market creation',
+  );
+  return extractEntity<Market>(body, ['market', 'data']);
 }
 
 export async function updateMarket(id: string, status: MarketStatus): Promise<Market> {
   const body = await request<unknown>(
     `/markets/${encodeURIComponent(id)}`,
-    { method: "PATCH", body: { status } },
-    "Market update",
+    { method: 'PATCH', body: { status } },
+    'Market update',
   );
-  return extractEntity<Market>(body, ["market", "data"]);
+  return extractEntity<Market>(body, ['market', 'data']);
 }
 
 export async function createVendor(input: NewVendorInput): Promise<Vendor> {
-  const body = await request<unknown>("/vendors", { method: "POST", body: input }, "Vendor creation");
-  return extractEntity<Vendor>(body, ["vendor", "data"]);
+  const body = await request<unknown>(
+    '/vendors',
+    { method: 'POST', body: input },
+    'Vendor creation',
+  );
+  return extractEntity<Vendor>(body, ['vendor', 'data']);
 }
 
 export async function updateVendor(id: string, input: VendorUpdateInput): Promise<Vendor> {
   const body = await request<unknown>(
     `/vendors/${encodeURIComponent(id)}`,
-    { method: "PATCH", body: input },
-    "Vendor update",
+    { method: 'PATCH', body: input },
+    'Vendor update',
   );
-  return extractEntity<Vendor>(body, ["vendor", "data"]);
+  return extractEntity<Vendor>(body, ['vendor', 'data']);
 }
 
 export async function updateTask(id: string, completed: boolean): Promise<SetupTask> {
   const body = await requestWithFallback<unknown>(
     [`/tasks/${encodeURIComponent(id)}`, `/setup-tasks/${encodeURIComponent(id)}`],
-    { method: "PATCH", body: { completed } },
-    "Setup task update",
+    { method: 'PATCH', body: { completed } },
+    'Setup task update',
   );
-  return extractEntity<SetupTask>(body, ["task", "data"]);
+  return extractEntity<SetupTask>(body, ['task', 'data']);
 }
