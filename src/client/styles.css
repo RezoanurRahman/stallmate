@@ -64,12 +64,13 @@
   --focus: #2b6172;
 
   /* Type */
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", roboto,
-    "helvetica neue", arial, sans-serif;
-  --font-display: "iowan old style", "palatino linotype", palatino,
-    "book antiqua", georgia, "times new roman", serif;
-  --font-mono: ui-monospace, "sf mono", sfmono-regular, menlo, consolas,
-    "liberation mono", monospace;
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', roboto, 'helvetica neue', arial, sans-serif;
+  --font-display:
+    'iowan old style', 'palatino linotype', palatino, 'book antiqua', georgia, 'times new roman',
+    serif;
+  --font-mono:
+    ui-monospace, 'sf mono', sfmono-regular, menlo, consolas, 'liberation mono', monospace;
 
   --text-xs: 0.72rem;
   --text-sm: 0.82rem;
@@ -100,10 +101,8 @@
   /* Shadows — warmed with ink rather than pure black */
   --shadow-xs: 0 1px 2px rgb(74 52 33 / 6%);
   --shadow-sm: 0 1px 2px rgb(74 52 33 / 6%), 0 3px 10px -6px rgb(74 52 33 / 18%);
-  --shadow-md: 0 2px 4px rgb(74 52 33 / 6%),
-    0 14px 28px -18px rgb(74 52 33 / 32%);
-  --shadow-lg: 0 4px 10px rgb(50 34 21 / 10%),
-    0 32px 60px -32px rgb(50 34 21 / 45%);
+  --shadow-md: 0 2px 4px rgb(74 52 33 / 6%), 0 14px 28px -18px rgb(74 52 33 / 32%);
+  --shadow-lg: 0 4px 10px rgb(50 34 21 / 10%), 0 32px 60px -32px rgb(50 34 21 / 45%);
 
   /* Motion */
   --ease: cubic-bezier(0.2, 0.7, 0.3, 1);
@@ -196,16 +195,9 @@ body {
   overflow-x: clip;
   min-block-size: 100%;
   background-color: var(--paper);
-  background-image: radial-gradient(
-      1200px 620px at 8% -12%,
-      rgb(193 87 58 / 7%),
-      transparent 62%
-    ),
-    radial-gradient(
-      900px 520px at 100% 2%,
-      rgb(76 115 97 / 7%),
-      transparent 58%
-    );
+  background-image:
+    radial-gradient(1200px 620px at 8% -12%, rgb(193 87 58 / 7%), transparent 62%),
+    radial-gradient(900px 520px at 100% 2%, rgb(76 115 97 / 7%), transparent 58%);
   background-repeat: no-repeat;
   color: var(--ink);
   font-family: var(--font-sans);
@@ -363,7 +355,7 @@ samp {
 }
 
 .eyebrow::before {
-  content: "";
+  content: '';
   inline-size: 1.15rem;
   block-size: 1px;
   background: currentcolor;
@@ -383,15 +375,15 @@ samp {
 
 /* Optional containers should never leave visual debris behind. */
 :where(
-    .page-subtitle,
-    .panel-subtitle,
-    .metric-trend,
-    .market-meta,
-    .task-meta,
-    .hero-details,
-    .progress-label,
-    .summary-card
-  ):empty {
+  .page-subtitle,
+  .panel-subtitle,
+  .metric-trend,
+  .market-meta,
+  .task-meta,
+  .hero-details,
+  .progress-label,
+  .summary-card
+):empty {
   display: none;
 }
 
@@ -428,17 +420,12 @@ samp {
 }
 
 .topbar::before {
-  content: "";
+  content: '';
   position: absolute;
   inset-block-start: 0;
   inset-inline: 0;
   block-size: 3px;
-  background: linear-gradient(
-    90deg,
-    var(--accent) 0%,
-    var(--amber) 46%,
-    var(--sage) 100%
-  );
+  background: linear-gradient(90deg, var(--accent) 0%, var(--amber) 46%, var(--sage) 100%);
   opacity: 0.85;
   pointer-events: none;
 }
@@ -482,11 +469,7 @@ samp {
   inline-size: 2.4rem;
   block-size: 2.4rem;
   border-radius: 0.8rem;
-  background: linear-gradient(
-    145deg,
-    var(--accent) 0%,
-    var(--accent-strong) 100%
-  );
+  background: linear-gradient(145deg, var(--accent) 0%, var(--accent-strong) 100%);
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 28%),
     var(--shadow-sm);
@@ -525,11 +508,8 @@ select.market-picker,
   padding-inline: 0.6rem 1.7rem;
   border: 0;
   background-color: transparent;
-  background-image: linear-gradient(
-      45deg,
-      transparent 50%,
-      var(--ink-muted) 50%
-    ),
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--ink-muted) 50%),
     linear-gradient(135deg, var(--ink-muted) 50%, transparent 50%);
   background-position:
     right 1rem center,
@@ -793,7 +773,7 @@ select.market-picker:focus-visible,
   border-color: var(--border);
 }
 
-.market-list-item:is(.is-active, [aria-current="true"]) {
+.market-list-item:is(.is-active, [aria-current='true']) {
   background: var(--accent-tint);
   border-color: color-mix(in srgb, var(--accent) 26%, transparent);
   box-shadow:
@@ -803,7 +783,7 @@ select.market-picker:focus-visible,
   font-weight: 600;
 }
 
-.market-list-item:is(.is-active, [aria-current="true"]) .market-meta {
+.market-list-item:is(.is-active, [aria-current='true']) .market-meta {
   color: color-mix(in srgb, var(--accent-ink) 78%, var(--ink-muted));
 }
 
@@ -820,7 +800,7 @@ select.market-picker:focus-visible,
 }
 
 .market-meta > :where(span, time) + :where(span, time)::before {
-  content: "·";
+  content: '·';
   margin-inline-end: 0.4rem;
   opacity: 0.6;
 }
@@ -911,13 +891,13 @@ select.market-picker:focus-visible,
   color: var(--ink);
 }
 
-.tab:is(.is-active, [aria-selected="true"]) {
+.tab:is(.is-active, [aria-selected='true']) {
   color: var(--accent-ink);
   font-weight: 600;
 }
 
-.tab:is(.is-active, [aria-selected="true"])::after {
-  content: "";
+.tab:is(.is-active, [aria-selected='true'])::after {
+  content: '';
   position: absolute;
   inset-inline: 0.55rem;
   inset-block-end: -1px;
@@ -948,7 +928,7 @@ select.market-picker:focus-visible,
 }
 
 .status-pill::before {
-  content: "";
+  content: '';
   flex: none;
   inline-size: 0.4rem;
   block-size: 0.4rem;
@@ -1022,17 +1002,9 @@ select.market-picker:focus-visible,
   gap: clamp(1rem, 2.4vw, 2rem);
   padding: clamp(1.1rem, 2.6vw, 1.9rem);
   overflow: hidden;
-  background: radial-gradient(
-      120% 150% at 100% 0%,
-      rgb(193 87 58 / 13%),
-      transparent 58%
-    ),
-    linear-gradient(
-      152deg,
-      var(--surface) 0%,
-      var(--accent-tint) 62%,
-      var(--surface-muted) 100%
-    );
+  background:
+    radial-gradient(120% 150% at 100% 0%, rgb(193 87 58 / 13%), transparent 58%),
+    linear-gradient(152deg, var(--surface) 0%, var(--accent-tint) 62%, var(--surface-muted) 100%);
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-sm);
@@ -1123,11 +1095,7 @@ select.market-picker:focus-visible,
   width: var(--progress, 0%);
   block-size: 100%;
   border-radius: inherit;
-  background: linear-gradient(
-    90deg,
-    var(--accent) 0%,
-    var(--accent-strong) 100%
-  );
+  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-strong) 100%);
   transition: width 320ms var(--ease);
 }
 
@@ -1201,7 +1169,7 @@ select.market-picker:focus-visible,
 }
 
 .activity-item::before {
-  content: "";
+  content: '';
   position: absolute;
   inset-block: 0;
   inset-inline-start: 0.75rem;
@@ -1294,7 +1262,7 @@ select.market-picker:focus-visible,
   background: color-mix(in srgb, var(--surface) 70%, transparent);
 }
 
-.filter-button:is(.is-active, .is-selected, [aria-pressed="true"]) {
+.filter-button:is(.is-active, .is-selected, [aria-pressed='true']) {
   background: var(--surface);
   border-color: var(--border);
   box-shadow: var(--shadow-xs);
@@ -1475,7 +1443,7 @@ select.market-picker:focus-visible,
 
 .task-item.is-done,
 .task-item.is-complete,
-.task-item[data-done="true"] {
+.task-item[data-done='true'] {
   background: var(--surface-muted);
   border-color: var(--border);
   box-shadow: none;
@@ -1483,7 +1451,7 @@ select.market-picker:focus-visible,
 
 .task-item.is-done :where(.task-copy),
 .task-item.is-complete :where(.task-copy),
-.task-item[data-done="true"] :where(.task-copy) {
+.task-item[data-done='true'] :where(.task-copy) {
   color: var(--ink-muted);
   text-decoration: line-through;
   text-decoration-color: var(--border-strong);
@@ -1523,7 +1491,7 @@ select.market-picker:focus-visible,
 }
 
 .task-check:not(input)::after {
-  content: "";
+  content: '';
   inline-size: 0.5rem;
   block-size: 0.28rem;
   border-block-end: 2px solid currentcolor;
@@ -1534,22 +1502,12 @@ select.market-picker:focus-visible,
   transition: opacity var(--transition);
 }
 
-.task-check:not(input):is(
-    :checked,
-    [aria-checked="true"],
-    .is-checked,
-    .is-done
-  ) {
+.task-check:not(input):is(:checked, [aria-checked='true'], .is-checked, .is-done) {
   background: var(--accent);
   border-color: var(--accent);
 }
 
-.task-check:not(input):is(
-    :checked,
-    [aria-checked="true"],
-    .is-checked,
-    .is-done
-  )::after {
+.task-check:not(input):is(:checked, [aria-checked='true'], .is-checked, .is-done)::after {
   opacity: 1;
 }
 
@@ -1594,7 +1552,7 @@ select.market-picker:focus-visible,
 }
 
 .empty-state::before {
-  content: "";
+  content: '';
   inline-size: 2.6rem;
   block-size: 2.6rem;
   margin-block-end: 0.4rem;
@@ -1658,7 +1616,7 @@ select.market-picker:focus-visible,
 }
 
 .loading-state::before {
-  content: "";
+  content: '';
   inline-size: 1.75rem;
   block-size: 1.75rem;
   border: 3px solid var(--border);
@@ -1882,7 +1840,7 @@ select.market-picker:focus-visible,
 }
 
 .button:disabled,
-.button[aria-disabled="true"] {
+.button[aria-disabled='true'] {
   opacity: 0.55;
   box-shadow: none;
   cursor: not-allowed;
@@ -1890,11 +1848,7 @@ select.market-picker:focus-visible,
 }
 
 .button.is-primary {
-  background: linear-gradient(
-    145deg,
-    var(--accent) 0%,
-    var(--accent-strong) 100%
-  );
+  background: linear-gradient(145deg, var(--accent) 0%, var(--accent-strong) 100%);
   border-color: color-mix(in srgb, var(--accent-strong) 70%, var(--ink));
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 22%),
@@ -1903,11 +1857,7 @@ select.market-picker:focus-visible,
 }
 
 .button.is-primary:hover {
-  background: linear-gradient(
-    145deg,
-    var(--accent-strong) 0%,
-    var(--accent-ink) 100%
-  );
+  background: linear-gradient(145deg, var(--accent-strong) 0%, var(--accent-ink) 100%);
   color: var(--accent-contrast);
 }
 
@@ -1985,11 +1935,8 @@ select.market-picker:focus-visible,
   appearance: none;
   -webkit-appearance: none;
   padding-inline-end: 2.1rem;
-  background-image: linear-gradient(
-      45deg,
-      transparent 50%,
-      var(--ink-muted) 50%
-    ),
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--ink-muted) 50%),
     linear-gradient(135deg, var(--ink-muted) 50%, transparent 50%);
   background-position:
     right 1.15rem center,
@@ -2008,8 +1955,8 @@ select.market-picker:focus-visible,
   resize: vertical;
 }
 
-input[type="checkbox"],
-input[type="radio"] {
+input[type='checkbox'],
+input[type='radio'] {
   accent-color: var(--accent);
 }
 
