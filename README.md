@@ -4,20 +4,28 @@
 
 Stallmate keeps one market day in a single place: which vendors are booked, which stall each of
 them stands in, what still has to be set up, and whether the site is actually ready to open. It
-pairs a Hyperapp 2 dashboard with an Express 5 API and deterministic in-memory storage, so the
-whole desk starts in a second and looks the same on every machine.
+pairs a Hyperapp 2 dashboard with an Express 5 API and an in-memory store seeded with the same
+sample market on every start, so the whole desk is up in a second with no database to set up.
 
 No database, no accounts, no API keys, no network calls: clone it, build it, run it.
 
 ## Key features
 
-- **Vendor roster** — every booked vendor with its category, contact, and setup notes.
-- **Stall assignments** — the stall map with zones and the vendor assigned to each stall, so you
-  can see who stands where before the gates open.
-- **Setup checklist** — the day's setup tasks with owner, priority, and status.
-- **Readiness view** — a rollup of open items that answers "can this market open yet?".
-- **Deterministic seed data** — the same sample market on every start, which makes the dashboard,
-  the API, and the tests reproducible.
+- **Market selector** — pick the weekend market you are working on; the roster, setup plan, and
+  readiness view all follow the selection.
+- **Vendor roster** — every booked vendor with its category, contact, stall code, fee, status,
+  and check-in state.
+- **Setup checklist** — the market's setup tasks grouped by area, with assignee, due time, and a
+  completion toggle.
+- **Readiness metrics** — stall allocation against capacity, checked-in vendors, open tasks, and
+  setup progress, so "can this market open yet?" has a visible answer.
+- **Status workflows** — market status moves through planning → confirmed → live → complete;
+  vendors are confirmed, pending, or waitlisted, and are checked in or out on the roster.
+- **Creation forms** — add a market from the header or a vendor from the roster without leaving
+  the dashboard.
+- **Deterministic seed data** — fixed sample records, with fixed ids and order on every start,
+  which makes the dashboard, the API, and the tests predictable. Mutations stay in memory, so
+  writes reset on restart and only the timestamps they generate differ between runs.
 - **One command dev loop** — `npm run dev` runs the Vite client and the API together, with
   `/api` proxied so the browser sees a single origin.
 
@@ -56,6 +64,26 @@ Check that the API is alive at any time:
 curl http://127.0.0.1:3000/api/health
 ```
 
+## User interface
+
+The Hyperapp client is one operations desk with a **market selector** in the header. The selected
+market scopes the vendor roster, the setup plan, and the readiness metrics.
+
+- **Overview** — the selected market's venue, neighborhood, date, notes, and status; stall
+  allocation against capacity; market status controls; "Today's brief" with open tasks and
+  pending or waitlisted vendors; setup progress; vendor status breakdown; and the recent activity
+  feed.
+- **Vendors** — the vendor roster table (category, stall, contact, fee, status, check-in) with a
+  search box, status filter chips, an inline check-in toggle, and an add-vendor form.
+- **Setup** — setup tasks grouped by area with per-area progress and a checkbox to mark each task
+  complete.
+
+Those are the status workflows: market status controls, vendor check-in, and task completion;
+a vendor's status (confirmed, pending, or waitlist) is chosen in the add-vendor form. Every
+change goes straight to the API and the dashboard re-fetches afterwards, so the screen always
+shows what the server stored. "New market" opens a modal form (name, date, venue, neighborhood,
+capacity, notes); "Add vendor" opens a form (market, name, category, stall, contact, fee, status).
+
 ## Development workflow
 
 ```bash
@@ -90,27 +118,56 @@ The server is a small JSON API mounted at `/api`. Start it with `npm start` (or 
 then use <http://localhost:5173/api/...> behind the Vite proxy or
 <http://127.0.0.1:3000/api/...> directly.
 
-- `GET /api/health` — liveness probe used by the dev proxy and the CI smoke test. It answers
-  `{"status":"ok", ...}` as soon as the process is listening; this is the URL to poll from a
-  script.
-- `/api/vendors`, `/api/stalls`, `/api/tasks` — the collections the desk is built around: the
-  vendor roster, stall assignments, and setup tasks. They follow the conventional REST shape:
-  `GET` for the collection, `GET /api/<collection>/:id` for one record, `POST` to create,
-  `PATCH` to update, and `DELETE` to remove.
-- Every response is JSON, and every write lands in the in-memory store, so restarting the server
-  puts the desk back to its seed state.
+| Route                    | What it does                                                                                                                   |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| `GET /api/health`        | Liveness probe used by the CI smoke test. Answers `{"status":"ok","service":"stallmate"}` once the process is listening.       |
+| `GET /api/dashboard`     | The whole desk in one payload: `markets`, `vendors`, `tasks`, `activity`, and derived `metrics`.                               |
+| `GET /api/markets`       | All markets.                                                                                                                   |
+| `POST /api/markets`      | Creates a market and returns it with HTTP 201.                                                                                 |
+| `PATCH /api/markets/:id` | Moves a market's status: `planning`, `confirmed`, `live`, or `complete`. `status` is required and the only accepted field.     |
+| `GET /api/vendors`       | All vendors, or one market's vendors with `?marketId=<id>`.                                                                    |
+| `POST /api/vendors`      | Creates a vendor on an existing market and returns it with HTTP 201.                                                           |
+| `PATCH /api/vendors/:id` | Updates `status` (`confirmed`, `pending`, `waitlist`) and/or `checkedIn` (boolean); at least one is required, no other fields. |
+| `GET /api/tasks`         | All setup tasks, or one market's tasks with `?marketId=<id>`.                                                                  |
+| `PATCH /api/tasks/:id`   | Sets `completed` (boolean), the required and only accepted field.                                                              |
+| `GET /api/activity`      | The activity feed, newest first.                                                                                               |
+
+### Payloads
+
+- **Market** — `id`, `name`, `date` (`YYYY-MM-DD`), `venue`, `neighborhood`, `status`, `capacity`,
+  `notes`, and `createdAt`. `POST` requires `name`, `date`, `venue`, and `neighborhood`; `capacity`
+  defaults to `20`, `notes` to `""`, and `status` to `"planning"`. A market with the same name and
+  date is rejected.
+- **Vendor** — `id`, `marketId`, `name`, `category`, `stall`, `contact`, `fee`, `status`,
+  `checkedIn`, and `createdAt`. `POST` requires `marketId`, `name`, `category`, `stall`, and
+  `contact`; the market must exist and the stall code must be free on that market. `fee` defaults
+  to `0`, `status` to `"pending"`, and `checkedIn` to `false`.
+- **Setup task** — `id`, `marketId`, `title`, `area`, `dueTime`, `assignee`, `completed`, and
+  `createdAt`. Tasks come from the seed data; the API only toggles `completed`.
+- **Activity** — `id`, `kind` (`market`, `vendor`, `task`, or `system`), `message`, and an ISO 8601
+  `timestamp`. Creating or updating a market, vendor, or task appends an entry.
+- **Dashboard metrics** — `upcomingMarkets` (markets that are not `complete`), `totalVendors`,
+  `openTasks`, and `readiness` (the percentage of setup tasks completed).
+
+There is no `GET /api/<collection>/:id`, no `DELETE`, and no `/api/stalls` route: the desk reads
+collections and supports the creations and updates above. Unknown ids answer 404, invalid bodies
+answer 400 as `{"error":"..."}`, and any other `/api/*` path answers 404.
 
 The server source in `src/server/` is the authoritative list of routes and payload shapes.
 
 ## Deterministic seed data
 
-On start, the API loads a fixed sample market: the same records, with the same ids, in the same
-order. Nothing is random and nothing is read from the clock or the file system, which means:
+On start, the API loads a fixed sample desk: the same seed records, with the same ids, in the same
+order, and with the same seed timestamps. That means:
 
 - the dashboard shows a realistic market day the first time you open it,
-- `curl` calls and screenshots are identical on every machine,
-- tests can assert exact ids and counts instead of fuzzy matches,
-- restarting the process is also "resetting the demo" — writes never persist.
+- `curl` calls and screenshots of the seeded records are identical on every machine,
+- tests can assert exact seed ids and counts instead of fuzzy matches.
+
+Only mutations vary: markets and vendors created after start, and the activity entries the API
+appends for changes, are stamped with the current clock, so those timestamps differ between runs.
+Everything still lives in memory, so restarting the process is also "resetting the demo" — writes
+never persist.
 
 There is no migration step, no seed script to run, and no database to install.
 
